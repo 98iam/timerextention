@@ -1,0 +1,10 @@
+{
+  "manifest_version": 3,
+  "name": "Study Timer",
+  "version": "1.0",
+  "description": "Tracks your study time throughout the day.",
+  "permissions": ["storage"],
+  "action": {
+    "default_popup": "popup.html"
+  }
+}

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Timer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            min-width: 380px; /* Adjusted for better content fit */
+            max-width: 400px;
+        }
+        /* Custom scrollbar for session log */
+        #sessionLog::-webkit-scrollbar {
+            width: 8px;
+        }
+        #sessionLog::-webkit-scrollbar-track {
+            background: #4a5568; /* Tailwind gray-700 */
+            border-radius: 10px;
+        }
+        #sessionLog::-webkit-scrollbar-thumb {
+            background: #718096; /* Tailwind gray-500 */
+            border-radius: 10px;
+        }
+        #sessionLog::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0; /* Tailwind gray-400 */
+        }
+    </style>
+</head>
+<body class="bg-gray-800 text-white p-4 font-sans">
+    <div class="container mx-auto">
+        <!-- Section 1: Current Timer -->
+        <div class="mb-6">
+            <h2 class="text-xl font-semibold mb-2 text-center text-gray-300">Current Session</h2>
+            <div id="currentTimerDisplay" class="text-6xl font-bold text-center my-4 text-green-400">00:00:00</div>
+            <button id="startStopButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded text-lg transition-colors duration-150">
+                Start Study
+            </button>
+        </div>
+
+        <!-- Section 2: Daily Summary -->
+        <div class="mb-6 p-3 bg-gray-700 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-1 text-center text-gray-300">Today's Total Study Time</h2>
+            <div id="totalDailyTimeDisplay" class="text-4xl font-bold text-center text-blue-400">00:00:00</div>
+        </div>
+
+        <!-- Section 3: Session Log for Today -->
+        <div>
+            <h2 class="text-lg font-semibold mb-2 text-center text-gray-300">Today's Sessions</h2>
+            <div id="sessionLog" class="space-y-2 max-h-48 overflow-y-auto bg-gray-900 p-3 rounded-lg shadow-inner">
+                <p id="noSessionsMessage" class="text-sm text-gray-500 text-center py-4">No study sessions recorded for today yet.</p>
+                <!-- Sessions will be appended here by JS -->
+                <!-- Example structure:
+                <div class="bg-gray-700 p-2 rounded text-xs shadow">
+                    <p><strong>Start:</strong> 10:00:00 AM | <strong>End:</strong> 10:25:00 AM</p>
+                    <p><strong>Duration:</strong> 25m 00s</p>
+                </div>
+                -->
+            </div>
+        </div>
+
+        <!-- Section 4: Reset Button -->
+        <div class="mt-8">
+            <button id="resetButton" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-3 rounded text-sm transition-colors duration-150">
+                Reset Today's Data
+            </button>
+        </div>
+        <p class="text-xs text-center text-gray-600 mt-4">Study Timer v1.0</p>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
