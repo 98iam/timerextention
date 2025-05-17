@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Timer - History</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Arial, sans-serif; /* Common Excel font */
+            background-color: #f0f2f5; /* Light gray background, like outside the sheet */
+            color: #333; /* Standard dark text color */
+            line-height: 1.5;
+            padding: 1.5rem;
+        }
+
+        .page-container {
+            max-width: 1100px; /* Wider for table layout */
+            margin: 0 auto;
+            background-color: #ffffff; /* White "sheet" background */
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header styles */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #dee2e6; /* Light border */
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #495057; /* Darker gray for title */
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .nav-link {
+            display: inline-block;
+            background-color: #0078d4; /* Excel's primary blue */
+            color: #ffffff;
+            padding: 0.6rem 1.2rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: background-color 0.2s ease-in-out;
+        }
+
+        .nav-link:hover {
+            background-color: #005a9e; /* Darker blue on hover */
+        }
+
+        /* Date selector */
+        .date-selector-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem;
+            background-color: #f8f9fa; /* Light background for the selector bar */
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+
+        .date-selector-container label {
+            font-size: 0.9rem;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .date-selector-container select {
+            background-color: #ffffff;
+            color: #495057;
+            border: 1px solid #ced4da;
+            padding: 0.5rem 0.75rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            flex-grow: 1; /* Allow select to take available space */
+            max-width: 250px;
+        }
+        .date-selector-container select:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        /* General Section Styling */
+        .content-section {
+            margin-bottom: 2rem;
+            border: 1px solid #e0e0e0; /* Subtle border around sections */
+            border-radius: 6px;
+            background-color: #fff; /* Ensure white background for sections */
+        }
+
+        .content-section-header {
+            background-color: #f7f7f7; /* Very light gray for section headers */
+            padding: 0.75rem 1.25rem;
+            border-bottom: 1px solid #e0e0e0;
+            border-top-left-radius: 5px; /* Match parent radius */
+            border-top-right-radius: 5px;
+        }
+
+        .content-section-header h2 {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 0;
+            font-weight: 500;
+        }
+        .content-section-body {
+            padding: 1.25rem;
+        }
+
+
+        /* Summary box */
+        .summary-box .total-time {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #0078d4; /* Excel blue for emphasis */
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        /* Stats section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+        }
+
+        .stat-item {
+            background-color: #f8f9fa; /* Light gray background for stat items */
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-item .stat-value {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #28a745; /* Excel green for stat values */
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.85rem;
+            color: #6c757d; /* Muted text for labels */
+        }
+
+        /* Sessions Table - Excel Style */
+        .sessions-table-container .content-section-header h2 {
+             text-align: left; /* Align title with table */
+        }
+
+        .sessions-table-wrapper {
+            max-height: 400px; /* Or desired height */
+            overflow-y: auto;
+            border: 1px solid #dee2e6; /* Border around the scrollable area */
+            border-top: none; /* As header already has bottom border */
+        }
+
+        .sessions-table {
+            width: 100%;
+            border-collapse: collapse; /* Essential for Excel-like borders */
+            font-size: 0.9rem;
+        }
+
+        .sessions-table th,
+        .sessions-table td {
+            border: 1px solid #d1d5db; /* Standard Excel cell border color */
+            padding: 0.6rem 0.8rem; /* Cell padding */
+            text-align: left;
+            vertical-align: middle; /* Align text vertically in cells */
+        }
+
+        .sessions-table th {
+            background-color: #e9ecef; /* Excel header row background */
+            color: #495057; /* Darker text for headers */
+            font-weight: 600; /* Bold headers */
+            position: sticky; /* Keep headers visible on scroll */
+            top: 0;
+            z-index: 1;
+        }
+        .sessions-table th:first-child { border-left: none;} /* Avoid double border on left of header */
+        .sessions-table th:last-child { border-right: none;} /* Avoid double border on right of header */
+
+
+        /* Zebra striping for table rows (optional but good for readability) */
+        .sessions-table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa; /* Slightly off-white for odd rows */
+        }
+        .sessions-table tbody tr:hover {
+            background-color: #e2e6ea; /* Highlight on hover */
+        }
+
+        .sessions-table td.column-date { width: 25%; }
+        .sessions-table td.column-start-time { width: 20%; }
+        .sessions-table td.column-duration { width: 20%; }
+        .sessions-table td.column-task { width: 35%; } /* Task - more space */
+        /* If you set column widths on TD, do it for TH as well or use <col> tags */
+        .sessions-table th.column-date { width: 25%; }
+        .sessions-table th.column-start-time { width: 20%; }
+        .sessions-table th.column-duration { width: 20%; }
+        .sessions-table th.column-task { width: 35%; }
+
+
+        /* No sessions message */
+        .no-sessions-message { /* Renamed for clarity */
+            text-align: center;
+            color: #6c757d;
+            padding: 1.5rem;
+            font-size: 0.95rem;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6; /* Add a top border if it follows the table wrapper */
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #dee2e6;
+        }
+
+        /* Custom scrollbar for table (optional, more Excel-like) */
+        .sessions-table-wrapper::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        .sessions-table-wrapper::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        .sessions-table-wrapper::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 5px;
+        }
+        .sessions-table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <div class="header">
+            <h1>Study Timer History</h1>
+            <a href="popup.html" class="nav-link">Back to Timer</a>
+        </div>
+
+        <div class="date-selector-container">
+            <label for="monthSelector">Filter by Month:</label>
+            <select id="monthSelector">
+                <option value="all">All Time</option>
+                <!-- Month options will be populated by JavaScript -->
+            </select>
+        </div>
+
+        <div class="content-section summary-section">
+            <div class="content-section-header">
+                <h2>Total Study Time</h2>
+            </div>
+            <div class="content-section-body summary-box">
+                <div id="totalTimeDisplay" class="total-time">00:00:00</div>
+            </div>
+        </div>
+
+        <div class="content-section stats-section">
+            <div class="content-section-header">
+                 <h2>Study Statistics</h2>
+            </div>
+            <div class="content-section-body">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div id="totalDaysStudied" class="stat-value">0</div>
+                        <div class="stat-label">Days Studied</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="totalSessions" class="stat-value">0</div>
+                        <div class="stat-label">Total Sessions</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="avgSessionLength" class="stat-value">0m</div>
+                        <div class="stat-label">Avg Session</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="longestSession" class="stat-value">0m</div>
+                        <div class="stat-label">Longest Session</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-section sessions-table-container">
+             <div class="content-section-header">
+                <h2>Study Sessions</h2>
+            </div>
+            <div id="sessionsTableWrapper" class="sessions-table-wrapper">
+                <table id="sessionsTable" class="sessions-table">
+                    <thead>
+                        <tr>
+                            <th class="column-date">Date</th>
+                            <th class="column-start-time">Start Time</th>
+                            <th class="column-duration">Duration</th>
+                            <th class="column-task">Task / Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTableBody">
+                        <!-- Study session rows will be dynamically inserted here by history.js -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="noSessionsMessage" class="no-sessions-message" style="display: none;">
+                No study sessions found for the selected period.
+            </div>
+        </div>
+
+        <div class="footer">
+            Study Timer v1.0
+        </div>
+    </div>
+
+    <script src="history.js"></script>
+</body>
+</html>

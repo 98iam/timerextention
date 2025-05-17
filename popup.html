@@ -4,18 +4,130 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Timer</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            min-width: 380px; /* Adjusted for better content fit */
-            max-width: 400px;
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        /* Custom scrollbar for session log */
+
+        body {
+            min-width: 380px;
+            max-width: 400px;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #1f2937; /* bg-gray-800 */
+            color: #ffffff; /* text-white */
+            padding: 1rem; /* p-4 */
+            line-height: 1.5;
+        }
+
+        .container {
+            /* mx-auto is less relevant with fixed body width but kept for structure */
+        }
+
+        /* Typography */
+        h2 {
+            font-weight: 600; /* font-semibold */
+            text-align: center;
+            color: #d1d5db; /* text-gray-300 */
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            font-weight: 700; /* font-bold */
+            padding-top: 0.75rem; /* py-3 or py-2 */
+            padding-bottom: 0.75rem;
+            padding-left: 1rem; /* px-4 or px-3 */
+            padding-right: 1rem;
+            border-radius: 0.25rem; /* rounded */
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+            text-align: center;
+        }
+
+        .btn-lg {
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        .btn-sm {
+            font-size: 0.875rem; /* text-sm */
+            padding-top: 0.5rem; /* py-2 */
+            padding-bottom: 0.5rem;
+            padding-left: 0.75rem; /* px-3 */
+            padding-right: 0.75rem;
+        }
+
+        /* Spacing utility */
+        .mb-6 { margin-bottom: 1.5rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .my-4 { margin-top: 1rem; margin-bottom: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .mt-4 { margin-top: 1rem; }
+
+        /* Card/Section Styling */
+        .section-card {
+            padding: 0.75rem; /* p-3 */
+            background-color: #374151; /* bg-gray-700 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06); /* shadow */
+        }
+
+
+        /* Section 1: Current Timer */
+        .current-session-section h2 {
+            font-size: 1.25rem; /* text-xl */
+        }
+
+        #currentTimerDisplay {
+            font-size: 3.75rem; /* text-6xl - This is quite large for a small popup */
+            font-weight: 700; /* font-bold */
+            text-align: center;
+            color: #4ade80; /* text-green-400 */
+        }
+
+        #startStopButton {
+            background-color: #22c55e; /* bg-green-500 */
+            color: #ffffff; /* text-white */
+        }
+        #startStopButton:hover {
+            background-color: #16a34a; /* hover:bg-green-600 */
+        }
+
+        /* Section 2: Daily Summary */
+        .daily-summary-section h2 {
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        #totalDailyTimeDisplay {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+            text-align: center;
+            color: #60a5fa; /* text-blue-400 */
+        }
+
+        /* Section 3: Session Log for Today */
+        .session-log-section h2 {
+            font-size: 1.125rem; /* text-lg */
+        }
+
+        #sessionLog {
+            max-height: 12rem; /* max-h-48 */
+            overflow-y: auto;
+            background-color: #111827; /* bg-gray-900 */
+            padding: 0.75rem; /* p-3 */
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06); /* shadow-inner */
+        }
+        /* Custom scrollbar for session log (from original) */
         #sessionLog::-webkit-scrollbar {
             width: 8px;
         }
         #sessionLog::-webkit-scrollbar-track {
-            background: #4a5568; /* Tailwind gray-700 */
+            background: #4a5568; /* Tailwind gray-700 if available, or choose another */
             border-radius: 10px;
         }
         #sessionLog::-webkit-scrollbar-thumb {
@@ -25,33 +137,82 @@
         #sessionLog::-webkit-scrollbar-thumb:hover {
             background: #a0aec0; /* Tailwind gray-400 */
         }
+
+        .session-item {
+            background-color: #374151; /* bg-gray-700 */
+            padding: 0.5rem; /* p-2 */
+            border-radius: 0.25rem; /* rounded */
+            font-size: 0.75rem; /* text-xs */
+            box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06); /* shadow */
+            margin-bottom: 0.5rem; /* Simulates space-y-2 for direct children */
+        }
+        .session-item:last-child {
+            margin-bottom: 0;
+        }
+        .session-item p {
+            line-height: 1.4;
+        }
+
+
+        #noSessionsMessage {
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* text-gray-500 */
+            text-align: center;
+            padding-top: 1rem; /* py-4 */
+            padding-bottom: 1rem;
+        }
+
+        /* Section 4: History Button */
+        #historyButton {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: #ffffff; /* text-white */
+        }
+        #historyButton:hover {
+            background-color: #2563eb; /* hover:bg-blue-600 */
+        }
+
+        /* Section 5: Reset Button */
+        #resetButton {
+            background-color: #eab308; /* bg-yellow-500 */
+            color: #111827; /* text-gray-900 */
+        }
+        #resetButton:hover {
+            background-color: #ca8a04; /* hover:bg-yellow-600 */
+        }
+
+        /* Footer */
+        .footer-text {
+            font-size: 0.75rem; /* text-xs */
+            text-align: center;
+            color: #4b5563; /* text-gray-600 */
+        }
     </style>
 </head>
-<body class="bg-gray-800 text-white p-4 font-sans">
-    <div class="container mx-auto">
+<body> <!-- Removed Tailwind classes -->
+    <div class="container">
         <!-- Section 1: Current Timer -->
-        <div class="mb-6">
-            <h2 class="text-xl font-semibold mb-2 text-center text-gray-300">Current Session</h2>
-            <div id="currentTimerDisplay" class="text-6xl font-bold text-center my-4 text-green-400">00:00:00</div>
-            <button id="startStopButton" class="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-4 rounded text-lg transition-colors duration-150">
+        <div class="current-session-section mb-6">
+            <h2 class="mb-2">Current Session</h2>
+            <div id="currentTimerDisplay" class="my-4">00:00:00</div>
+            <button id="startStopButton" class="btn btn-lg">
                 Start Study
             </button>
         </div>
 
         <!-- Section 2: Daily Summary -->
-        <div class="mb-6 p-3 bg-gray-700 rounded-lg shadow">
-            <h2 class="text-lg font-semibold mb-1 text-center text-gray-300">Today's Total Study Time</h2>
-            <div id="totalDailyTimeDisplay" class="text-4xl font-bold text-center text-blue-400">00:00:00</div>
+        <div class="daily-summary-section section-card mb-6">
+            <h2 class="mb-1">Today's Total Study Time</h2>
+            <div id="totalDailyTimeDisplay">00:00:00</div>
         </div>
 
         <!-- Section 3: Session Log for Today -->
-        <div>
-            <h2 class="text-lg font-semibold mb-2 text-center text-gray-300">Today's Sessions</h2>
-            <div id="sessionLog" class="space-y-2 max-h-48 overflow-y-auto bg-gray-900 p-3 rounded-lg shadow-inner">
-                <p id="noSessionsMessage" class="text-sm text-gray-500 text-center py-4">No study sessions recorded for today yet.</p>
+        <div class="session-log-section">
+            <h2 class="mb-2">Today's Sessions</h2>
+            <div id="sessionLog">
+                <p id="noSessionsMessage">No study sessions recorded for today yet.</p>
                 <!-- Sessions will be appended here by JS -->
-                <!-- Example structure:
-                <div class="bg-gray-700 p-2 rounded text-xs shadow">
+                <!-- Example structure for JS (make sure to add class="session-item"):
+                <div class="session-item">
                     <p><strong>Start:</strong> 10:00:00 AM | <strong>End:</strong> 10:25:00 AM</p>
                     <p><strong>Duration:</strong> 25m 00s</p>
                 </div>
@@ -59,13 +220,20 @@
             </div>
         </div>
 
-        <!-- Section 4: Reset Button -->
-        <div class="mt-8">
-            <button id="resetButton" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2 px-3 rounded text-sm transition-colors duration-150">
+        <!-- Section 4: History Button -->
+        <div class="mt-6">
+            <button id="historyButton" class="btn btn-sm">
+                View Study History
+            </button>
+        </div>
+
+        <!-- Section 5: Reset Button -->
+        <div class="mt-4">
+            <button id="resetButton" class="btn btn-sm">
                 Reset Today's Data
             </button>
         </div>
-        <p class="text-xs text-center text-gray-600 mt-4">Study Timer v1.0</p>
+        <p class="footer-text mt-4">Study Timer v1.0</p>
     </div>
     <script src="popup.js"></script>
 </body>

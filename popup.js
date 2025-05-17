@@ -192,6 +192,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // History button event handler
+    const historyButton = document.getElementById('historyButton');
+    historyButton.addEventListener('click', () => {
+        chrome.tabs.create({ url: 'history.html' });
+    });
+
     resetButton.addEventListener('click', async () => {
         if (confirm("Are you sure you want to reset all of today's study data? This cannot be undone.")) {
             if (activeSession.isRunning) {
