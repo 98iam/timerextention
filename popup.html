@@ -186,6 +186,68 @@
             text-align: center;
             color: #4b5563; /* text-gray-600 */
         }
+        
+        /* Toggle switch styles */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background-color: #374151;
+            border-radius: 0.5rem;
+        }
+        
+        .toggle-label {
+            font-size: 0.875rem;
+            color: #d1d5db;
+            font-weight: 500;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 20px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #4b5563;
+            transition: .4s;
+            border-radius: 20px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #3b82f6;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
     </style>
 </head>
 <body> <!-- Removed Tailwind classes -->
@@ -233,6 +295,16 @@
                 Reset Today's Data
             </button>
         </div>
+        
+        <!-- Section 6: Floating Timer Toggle -->
+        <div class="toggle-container">
+            <span class="toggle-label">Floating Timer</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="floatingTimerToggle">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
         <p class="footer-text mt-4">Study Timer v1.0</p>
     </div>
     <script src="popup.js"></script>

@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sessionLogElement = document.getElementById('sessionLog');
     const noSessionsMessage = document.getElementById('noSessionsMessage');
     const resetButton = document.getElementById('resetButton');
+    const floatingTimerToggle = document.getElementById('floatingTimerToggle');
 
     let timerInterval = null;
     let activeSession = {
@@ -197,6 +198,39 @@ document.addEventListener('DOMContentLoaded', () => {
     historyButton.addEventListener('click', () => {
         chrome.tabs.create({ url: 'history.html' });
     });
+    
+    // Floating timer toggle handler
+    if (floatingTimerToggle) {
+        // Initialize toggle state
+        chrome.storage.local.get('timerHidden', (result) => {
+            const isHidden = result.timerHidden || false;
+            floatingTimerToggle.checked = !isHidden;
+            console.log('Initial floating timer state:', !isHidden ? 'visible' : 'hidden');
+        });
+        
+        // Add event listener
+        floatingTimerToggle.addEventListener('change', () => {
+            const isVisible = floatingTimerToggle.checked;
+            console.log('Toggling floating timer to:', isVisible ? 'visible' : 'hidden');
+            
+            // First update the storage
+            chrome.storage.local.set({ 'timerHidden': !isVisible }, () => {
+                // Then send message to background script
+                chrome.runtime.sendMessage({ 
+                    action: 'toggleFloatingTimer'
+                }, (response) => {
+                    console.log('Toggle response:', response);
+                    
+                    // Force refresh active tabs to ensure the timer appears/disappears
+                    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+                        if (tabs[0] && tabs[0].url && tabs[0].url.startsWith('http')) {
+                            chrome.tabs.reload(tabs[0].id);
+                        }
+                    });
+                });
+            });
+        });
+    }
 
     resetButton.addEventListener('click', async () => {
         if (confirm("Are you sure you want to reset all of today's study data? This cannot be undone.")) {
@@ -243,6 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderSessionLog();
         updateTotalDailyTimeUI();
+        
+        // Initialize floating timer toggle
+        if (floatingTimerToggle) {
+            chrome.storage.local.get('timerHidden', (result) => {
+                const isHidden = result.timerHidden || false;
+                floatingTimerToggle.checked = !isHidden;
+            });
+        }
     }
 
     initializePopup();
