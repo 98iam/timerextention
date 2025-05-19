@@ -154,15 +154,22 @@ document.addEventListener('DOMContentLoaded', () => {
         sessionsTableWrapper.style.display = 'block';
         noSessionsMessage.style.display = 'none';
         
-        // Sort sessions by date and time (newest first)
-        sessions.sort((a, b) => b.startTime - a.startTime);
+        // Group sessions by date
+        const sessionsByDate = groupSessionsByDate(sessions);
         
-        // Add each session as a table row
-        sessions.forEach(session => {
-            const row = document.createElement('tr');
+        // Process each date group
+        Object.keys(sessionsByDate).sort().reverse().forEach(date => {
+            const sessionsForDay = sessionsByDate[date];
+            
+            // Calculate total time for this day
+            const dailyTotalTime = sessionsForDay.reduce((sum, session) => sum + session.duration, 0);
+            
+            // Create a header row for the date with total time
+            const dateHeaderRow = document.createElement('tr');
+            dateHeaderRow.className = 'date-header-row';
             
             // Format date
-            const sessionDate = new Date(session.date);
+            const sessionDate = new Date(date);
             const dateFormatted = sessionDate.toLocaleDateString(undefined, { 
                 weekday: 'short',
                 year: 'numeric', 
@@ -170,21 +177,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 day: 'numeric' 
             });
             
-            // Format times
-            const startTimeStr = new Date(session.startTime).toLocaleTimeString([], { 
-                hour: '2-digit', 
-                minute: '2-digit'
-            });
-            
-            // Create table row
-            row.innerHTML = `
-                <td class="column-date">${dateFormatted}</td>
-                <td class="column-start-time">${startTimeStr}</td>
-                <td class="column-duration">${formatDurationForLog(session.duration)}</td>
-                <td class="column-task">Study Session</td>
+            // Add date header with total time for the day
+            dateHeaderRow.innerHTML = `
+                <td colspan="4" class="date-header">
+                    <div class="date-header-content">
+                        <span class="date-header-text">${dateFormatted}</span>
+                        <span class="daily-total-time">Total: ${formatDurationForLog(dailyTotalTime)}</span>
+                    </div>
+                </td>
             `;
             
-            sessionsTableBody.appendChild(row);
+            sessionsTableBody.appendChild(dateHeaderRow);
+            
+            // Add individual sessions for this day
+            sessionsForDay.forEach(session => {
+                const row = document.createElement('tr');
+                
+                // Format times
+                const startTimeStr = new Date(session.startTime).toLocaleTimeString([], { 
+                    hour: '2-digit', 
+                    minute: '2-digit'
+                });
+                
+                // Create table row
+                row.innerHTML = `
+                    <td class="column-date"></td>
+                    <td class="column-start-time">${startTimeStr}</td>
+                    <td class="column-duration">${formatDurationForLog(session.duration)}</td>
+                    <td class="column-task">Study Session</td>
+                `;
+                
+                sessionsTableBody.appendChild(row);
+            });
         });
     }
 
